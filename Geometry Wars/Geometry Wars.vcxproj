@@ -163,7 +163,7 @@
     <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\EntryPoint.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>

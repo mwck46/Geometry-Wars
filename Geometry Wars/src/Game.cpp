@@ -19,192 +19,7 @@ void Game::init(const std::string& config)
 	m_backgroundSprite.setTexture(m_backgroundTexture);
 	m_backgroundSprite.setPosition(sf::Vector2f(0, 0));
 
-	//Read in the config file 
-	std::fstream input{config};
-
-	if (!input.is_open())
-	{
-		std::cout << "Failed to open: " << config << '\n';
-		exit(-1);
-	}
-
-	std::string identifier{};
-	while (input >> identifier)
-	{
-		if (identifier == "Window")
-		{
-			unsigned int width{};
-			input >> width;
-
-			unsigned int height{};
-			input >> height;
-
-			int frameLimit{};
-			input >> frameLimit;
-
-			int fullScreen{};
-			input >> fullScreen;
-			if (fullScreen == 0)
-			{
-				m_window.create(sf::VideoMode(width, height), "Geometry Wars", sf::Style::Close);
-				m_window.setFramerateLimit(frameLimit);
-			}
-			else if (fullScreen == 1)
-			{
-				auto fullscreenMode{ sf::VideoMode::getFullscreenModes() };
-				//fullscreenMode[0] is the most compatible mode for fullscreen on this device
-				m_window.create(fullscreenMode[0], "Geometry Wars", sf::Style::Fullscreen);
-				m_window.setFramerateLimit(frameLimit);
-			}
-		}
-		else if (identifier == "Font")
-		{
-			std::string filepath{};
-			input >> filepath;
-			if (!m_font.loadFromFile(filepath))
-			{
-				std::cerr << "Failed to load font. Filepath: " << filepath;
-			}
-
-			m_scoreText.setFont(m_font);
-			
-			int fontSize{};
-			input >> fontSize;
-			m_scoreText.setCharacterSize(fontSize);
-
-			sf::Vector3i RGB{};
-			input >> RGB.x;
-			input >> RGB.y;
-			input >> RGB.z;
-			m_scoreText.setFillColor(sf::Color(RGB.x, RGB.y, RGB.z));
-		}
-		else if (identifier == "Player")
-		{
-			int shapeRadius{};
-			input >> shapeRadius;
-			m_playerConfig.SR = shapeRadius;
-
-			int collisionRadius{};
-			input >> collisionRadius;
-			m_playerConfig.CR = collisionRadius;
-
-			float speed{};
-			input >> speed;
-			m_playerConfig.S = speed;
-
-			sf::Vector3i fillColor{};
-			input >> fillColor.x;
-			input >> fillColor.y;
-			input >> fillColor.z;
-			m_playerConfig.FR = fillColor.x;
-			m_playerConfig.FG = fillColor.y;
-			m_playerConfig.FB = fillColor.z;
-
-			sf::Vector3i outlineColor{};
-			input >> outlineColor.x;
-			input >> outlineColor.y;
-			input >> outlineColor.z;
-			m_playerConfig.OR = outlineColor.x;
-			m_playerConfig.OG = outlineColor.y;
-			m_playerConfig.OB = outlineColor.z;
-
-			int outlineThickness{};
-			input >> outlineThickness;
-			m_playerConfig.OT = outlineThickness;
-
-			int vertices{};
-			input >> vertices;
-			m_playerConfig.V = vertices;
-		}
-		else if (identifier == "Enemy")
-		{
-			int shapeRadius{};
-			input >> shapeRadius;
-			m_enemyConfig.SR = shapeRadius;
-
-			int collisionRadius{};
-			input >> collisionRadius;
-			m_enemyConfig.CR = collisionRadius;
-
-			float minSpeed{};
-			input >> minSpeed;
-			m_enemyConfig.SMIN = minSpeed;
-
-			float maxSpeed{};
-			input >> maxSpeed;
-			m_enemyConfig.SMAX = maxSpeed;
-
-			sf::Vector3i outlineColor{};
-			input >> outlineColor.x;
-			input >> outlineColor.y;
-			input >> outlineColor.z;
-			m_enemyConfig.OR = outlineColor.x;
-			m_enemyConfig.OG = outlineColor.y;
-			m_enemyConfig.OB = outlineColor.z;
-
-			int outlineThickness{};
-			input >> outlineThickness;
-			m_enemyConfig.OT = outlineThickness;
-
-			int minVertices{};
-			input >> minVertices;
-			m_enemyConfig.VMIN = minVertices;
-
-			int maxVertices{};
-			input >> maxVertices;
-			m_enemyConfig.VMAX = maxVertices;
-
-			int smallLifespan{};
-			input >> smallLifespan;
-			m_enemyConfig.L = smallLifespan;
-
-			int spawnInterval{};
-			input >> spawnInterval;
-			m_enemyConfig.SI = spawnInterval;
-		}
-		else if (identifier == "Bullet")
-		{
-			int shapeRadius{};
-			input >> shapeRadius;
-			m_bulletConfig.SR = shapeRadius;
-
-			int collisionRadius{};
-			input >> collisionRadius;
-			m_bulletConfig.CR = collisionRadius;
-
-			float speed{};
-			input >> speed;
-			m_bulletConfig.S = speed;
-
-			sf::Vector3i fillColor{};
-			input >> fillColor.x;
-			input >> fillColor.y;
-			input >> fillColor.z;
-			m_bulletConfig.FR = fillColor.x;
-			m_bulletConfig.FG = fillColor.y;
-			m_bulletConfig.FB = fillColor.z;
-
-			sf::Vector3i outlineColor{};
-			input >> outlineColor.x;
-			input >> outlineColor.y;
-			input >> outlineColor.z;
-			m_bulletConfig.OR = outlineColor.x;
-			m_bulletConfig.OG = outlineColor.y;
-			m_bulletConfig.OB = outlineColor.z;
-
-			int outlineThickness{};
-			input >> outlineThickness;
-			m_bulletConfig.OT = outlineThickness;
-
-			int shapeVertices{};
-			input >> shapeVertices;
-			m_bulletConfig.V = shapeVertices;
-
-			int lifespan{};
-			input >> lifespan;
-			m_bulletConfig.L = lifespan;
-		}
-	}
+	hReadConfig(config);
 
 	m_scoreText.setPosition(0, 0);
 	m_scoreText.setString(std::to_string(m_score));
@@ -699,6 +514,124 @@ void Game::spawnBullet(std::shared_ptr<Entity> shooter, const Vec2& mousePos)
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
+}
+
+void Game::hReadConfig(std::string config)
+{
+	//Read in the config file 
+	std::fstream input{ config };
+
+	if (!input.is_open())
+	{
+		std::cout << "Failed to open: " << config << '\n';
+		exit(-1);
+	}
+
+	std::string identifier{};
+	while (input >> identifier)
+	{
+		if (identifier == "Window")
+		{
+			sf::VideoMode vm;
+			int frameLimit{}, fullScreen{};
+
+			input >> vm.width;
+			input >> vm.height;
+			input >> frameLimit;
+			input >> fullScreen;
+
+			if (fullScreen == 0)
+			{
+				m_window.create(vm, "Geometry Wars", sf::Style::Close);
+				m_window.setFramerateLimit(frameLimit);
+			}
+			else if (fullScreen == 1)
+			{
+				auto fullscreenMode{ sf::VideoMode::getFullscreenModes() };
+				//fullscreenMode[0] is the most compatible mode for fullscreen on this device
+				m_window.create(fullscreenMode[0], "Geometry Wars", sf::Style::Fullscreen);
+				m_window.setFramerateLimit(frameLimit);
+			}
+		}
+		else if (identifier == "Font")
+		{
+			std::string filepath{};
+			input >> filepath;
+			if (!m_font.loadFromFile(filepath))
+			{
+				std::cerr << "Failed to load font. Filepath: " << filepath;
+			}
+			m_scoreText.setFont(m_font);
+
+			int fontSize{};
+			input >> fontSize;
+			m_scoreText.setCharacterSize(fontSize);
+
+			sf::Color clr;
+			input >> clr.r;
+			input >> clr.g;
+			input >> clr.b;
+			m_scoreText.setFillColor(clr);
+		}
+		else if (identifier == "Player")
+		{
+			input >> m_playerConfig.SR;
+
+			input >> m_playerConfig.CR;
+			input >> m_playerConfig.S;
+
+			input >> m_playerConfig.FR;
+			input >> m_playerConfig.FG;
+			input >> m_playerConfig.FB;
+
+			input >> m_playerConfig.OR;
+			input >> m_playerConfig.OG;
+			input >> m_playerConfig.OB;
+			input >> m_playerConfig.OT;
+
+			input >> m_playerConfig.V;
+		}
+		else if (identifier == "Enemy")
+		{
+			input >> m_enemyConfig.SR;
+			input >> m_enemyConfig.CR;
+
+			input >> m_enemyConfig.SMIN;
+			input >> m_enemyConfig.SMAX;
+
+			input >> m_enemyConfig.OR;
+			input >> m_enemyConfig.OG;
+			input >> m_enemyConfig.OB;
+			input >> m_enemyConfig.OT;
+
+			input >> m_enemyConfig.VMIN;
+			input >> m_enemyConfig.VMAX;
+
+			input >> m_enemyConfig.L;
+
+			input >> m_enemyConfig.SI;
+		}
+		else if (identifier == "Bullet")
+		{
+			input >> m_bulletConfig.SR;
+
+			input >> m_bulletConfig.CR;
+			input >> m_bulletConfig.S;
+
+			input >> m_bulletConfig.FR;
+			input >> m_bulletConfig.FG;
+			input >> m_bulletConfig.FB;
+
+			input >> m_bulletConfig.OR;
+			input >> m_bulletConfig.OG;
+			input >> m_bulletConfig.OB;
+			input >> m_bulletConfig.OT;
+
+			input >> m_bulletConfig.V;
+
+			input >> m_bulletConfig.L;
+		}
+	}
 }
 
 void Game::run()
